@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- Website template form http://www.cssmoban.com/ -->
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Contact - ISTARFARMBLOG</title>
+	<link rel="stylesheet" href="stylesheets/style.css" type="text/css">
+</head>
+<body>
+	<div class="border">
+		<div id="bg">
+			background
+		</div>
+		<div class="page">
+			<div class="sidebar">
+				<a href="/" id="logo"><img src="images/logo.png" alt="logo"></a>
+				<ul>
+					<li>
+						<a href="/">Home</a>
+					</li>
+					<li>
+						<a href="/about">About</a>
+					</li>
+					<li>
+						<a href="/blog">Blog</a>
+					</li>
+					<li class="selected">
+						<a href="/contact">Contact</a>
+					</li>
+				</ul>
+			</div>
+
+			<!--这里使用ajax提交，这样返回结果不必换页。-->
+			<div class="body">
+				<div class="contact">
+					<h2>Contact Us</h2>
+					<form action="processor/contact" method="post">
+						<label for="firstname">First Name</label>
+						<input type="text" id="firstname">
+						<label for="lastname">Last Name</label>
+						<input type="text" id="lastname">
+						<label for="email">Email Address</label>
+						<input type="text" id="email">
+						<label for="subject">Subject</label>
+						<input type="text" id="subject">
+						<label for="message">Message</label>
+						<textarea name="" cols="30" rows="10" id="message"></textarea>
+						<input type="submit" id="submit2" value="">
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

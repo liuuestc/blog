@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <!--
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    -->
+    <link rel='stylesheet' href='/stylesheets/edit.css' />
+    <script charset="utf-8" src="/js/jQuery.js"></script>
+    <script charset="utf-8" src="/kindeditor/kindeditor-all-min.js"></script>
+    <script charset="UTF-8" src="/kindeditor/lang/zh-CN.js"></script>
+    <script>
+      KindEditor.ready(function (K) {
+        window.editor = K.create('#thecontent')
+      });
+    </script>
+  </head>
+  <body background="/images/bg-body.jpg" style="margin-left: 15%">
+  <div style="width: 80%" >
+    <form  id="article" action="/articles/create" method="post">
+      <h4>文章的主题</h4>
+      <select name="subject" style="width: 20%">
+        <optgroup label="Computer">
+          <option value="Language">Language</option>
+          <option value="Ideology">Ideology</option>
+        </optgroup>
+        <optgroup label="Reading notes">
+          <option value="China">China</option>
+          <option value="Foreign">Foreign</option>
+        </optgroup>
+      </select>
+      <h4>文章的标签</h4>
+      <input id="tags" name="tags" type="text" style="width: 100%;" placeholder="如果有多个请使用逗号隔开"/>
+      <h4>编辑文章名字</h4>
+      <input id="title" name="title" type="text" style="width: 100%"/>
+      <h4><strong>编辑文章正文</strong></h4>
+      <!--函数暂时还没有-->
+      <textarea  style="width: 100%" name="thecontent" id="thecontent" rows="30"></textarea>
+        <input type="submit" value="Submit"/>
+      <button type="submit" id="confirm"  disabled="disabled" onclick="confirmArticle()">
+        确认发表
+      </button>
+      <button type="submit" id="cancel" disabled="disabled" onclick="cancelArticle()">
+        放弃发表
+      </button>
+      <button type="submit" id="delay" disabled="disabled"  onclick="delayArticle()">
+        收藏到草稿箱
+      </button>
+    </form>
+  </div>
+  </body>
+</html>
