@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var formidable = require('formidable');
 var db1 = require('../models/article'),
     mongoose = require('mongoose'),
     Poster = mongoose.model('Poster');
@@ -21,7 +22,7 @@ router.get('/create',function (req, res) {
 
 //将文章存储到数据库中。
 router.post('/create', function (req, res) {
-    console.log(req.body);
+    //console.log(req.body);
     Poster.create({
         subject: req.body.subject,
         tags : req.body.tags,
@@ -37,6 +38,28 @@ router.post('/create', function (req, res) {
             console.log("文章创建失败！");
             res.redirect('/articles/create');
         }
+    });
+});
+
+
+//处理图片有kindeditor上传
+router.post('/uploadImg', function (req, res) {
+    var form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.uploadDir = __dirname + '/../public/uploadImg';
+    form.parse(req, function (err, fields, files) {
+        if (err) {
+            throw err;
+        }
+        var image = files.imgFile;
+        var path = image.path;
+        path = path.replace('/\\/g', '/');
+        var url = '/uploadImg' + path.substr(path.lastIndexOf('/'), path.length);
+        var info = {
+            "error": 0,
+            "url": url
+        };
+        res.send(info)
     });
 });
 

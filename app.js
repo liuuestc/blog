@@ -6,6 +6,7 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 var processor = require('./routes/processor');
@@ -42,6 +43,12 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/processor', processor);
 app.use('/articles', articles);
+
+//下面的代码用于测设使用
+
+//以上的代码用于测试使用
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

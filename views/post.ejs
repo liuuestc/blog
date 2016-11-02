@@ -13,9 +13,12 @@
     <script charset="utf-8" src="/kindeditor/kindeditor-all-min.js"></script>
     <script charset="UTF-8" src="/kindeditor/lang/zh-CN.js"></script>
     <script>
-      KindEditor.ready(function (K) {
-        window.editor = K.create('#thecontent')
-      });
+        var options = {
+            uploadJson: '/articles/uploadImg'
+        };
+        KindEditor.ready(function(K) {
+            window.editor = K.create('#thecontent', options);
+        });
     </script>
   </head>
   <body background="/images/bg-body.jpg" style="margin-left: 15%">
