@@ -18,3 +18,16 @@ var PostSchema = new Schema({
 });
 // Build the User model
 var Poster = mongoose.model( 'Poster', PostSchema );
+
+
+var MessageSchema = new Schema({
+    firstName :  String,
+    lastName : String,
+    emailAddress : String,
+    subject : String,
+    message : String,
+    createOn : {type: Date, default:Date.now},
+    readed : {type: Boolean , default: false}
+});
+
+var Message = mongoose.model('Message', MessageSchema);
