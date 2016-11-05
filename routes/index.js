@@ -1,5 +1,9 @@
 var express = require('express');
 var router = express.Router();
+var db4 = require('../models/article'),
+    mongoose = require('mongoose'),
+    Poster = mongoose.model('Poster'),
+    HotPost = mongoose.model('HotPost');
 
 /*
  *
@@ -17,7 +21,33 @@ router.get('/about', function (req, res) {
 });
 
 router.get('/blog',function (req, res) {
-   res.render('blog');
+    HotPost.find(
+        function (err, data) {
+            if(!err){
+                var titles = new Array(4);
+                var num = data.length;
+                for (var i =0 ;i < num; i++){
+                    var t = hotToTitle(data[i]);
+                    switch (data[i]['subject']){
+                        case 'Language' :
+                            titles[0] = t;
+                            break;
+                        case 'Ideology' :
+                            titles[1] = t;
+                            break;
+                        case 'China':
+                            titles[2] = t;
+                            break;
+                        case 'Foreign':
+                            titles[3] = t;
+                            break;
+                    }
+                }
+                res.render('blog',{hotTitle1: titles[0],hotTitle2: titles[1],hotTitle3: titles[2],hotTitle4 : titles[3]});
+
+
+            }
+        });
 });
 
 router.get('/error',function (req, res) {
@@ -40,4 +70,14 @@ router.get('/services',function (req, res) {
 router.get('/contact', function (req, res) {
    res.render('contact');
 });
+
+function hotToTitle(subject) {
+    var title = "<a href='/articles/article/'" + subject['_id'] + "> "+ subject['title']+"</a>" +
+        "<p style='margin-top: 5px;margin-bottom: 0px'><small>阅读量：" + subject['readNum'] +
+        " 日期： " + subject['createdOn'] +
+        "标签：" + subject['tags']+ "</small></p>";
+    return title;
+}
+
+
 module.exports = router;

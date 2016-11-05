@@ -19,6 +19,18 @@ var PostSchema = new Schema({
 // Build the User model
 var Poster = mongoose.model( 'Poster', PostSchema );
 
+var hotSchema = new Schema({
+    subject: String,  //文章的类别
+    tags: String,     //文章系类
+    title:  String,   //文章的标题
+    author:String,    //作者
+    readNum: {type: Number, default: 0}, //文章的阅读量
+    createdOn: String, //创建时间
+    myCreateOn:{type: Date,default: Date.now}
+});
+
+var HotPost = mongoose.model('HotPost', hotSchema);
+
 
 var MessageSchema = new Schema({
     firstName :  String,
