@@ -32,7 +32,9 @@ router.post('/create', function (req, res) {
     }, function (err, post) {
         if (!err){
             console.log('文章创建成功！');
-            res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author})
+            var date = processDateString(post.createdOn);
+            console.log(date);
+            res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: date, readNum: post.readNum});
         }
         if (!post){
             console.log("文章创建失败！");
@@ -63,11 +65,36 @@ router.post('/uploadImg', function (req, res) {
     });
 });
 
+//获取某一类型的文章
+router.get('/class/:category/:id',function (req, res) {
+   var category = req.params['category'],
+       id = req.params['id'];
+    Poster.find(
+        {subject: category},
+        'title tags readNum createOn _id',
+        {sort: '-_id',skip:parseInt(req.params['id'])*10, limit: 10},
+        function (err, poster) {
+            if(!err){
+                res.json({'status' : 'ok', 'postes' :poster})
+            }
+            if (!poster){
+                res.json({'status' : 'error'});
+            }
+        });
+});
+
+
 //文章编辑后展示页面
 
 router.get('/show/:date', function (req, res) {
     console.log(req.params['date']);
 
 });
+
+function processDateString(date) {
+    var dt = new Date(date.toString());
+    return dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate() +
+        '  ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
+}
 
 module.exports = router;
