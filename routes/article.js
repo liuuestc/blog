@@ -71,14 +71,19 @@ router.get('/class/:category/:id',function (req, res) {
        id = req.params['id'];
     Poster.find(
         {subject: category},
-        'title tags readNum createOn _id',
-        {sort: '-_id',skip:parseInt(req.params['id'])*10, limit: 10},
+        'title tags readNum createdOn _id',
+        {sort: '-_id',skip:parseInt(req.params['id'])*8,limit: 8},
         function (err, poster) {
             if(!err){
-                res.json({'status' : 'ok', 'postes' :poster})
+                var titles = '';
+                var length = poster.length;
+                for (var i = 1; i < length ; i ++){
+                    titles += hotToTitle(poster[i],i);
+                }
+                res.render('titles',{titles: titles});
             }
             if (!poster){
-                res.json({'status' : 'error'});
+                res.render('<p>没有更多的文章了</p>');
             }
         });
 });
@@ -100,28 +105,49 @@ router.get('/hot', function (req, res) {
                 var titles = new Array(4);
                 var num = data.length;
                 for (var i =0 ;i < num; i++){
-                    var t = hotToTitle(data[i]);
-                    console.log(t);
                     switch (data[i]['subject']){
                         case 'Language' :
-                            titles[0] = t;
+                            titles[0] = hotToTitle(data[i],0);
                             break;
                         case 'Ideology' :
-                            titles[1] = t;
+                            titles[1] = hotToTitle(data[i],1);
                             break;
                         case 'China':
-                            titles[2] = t;
+                            titles[2] = hotToTitle(data[i],2);
                             break;
                         case 'Foreign':
-                            titles[3] = t;
+                            titles[3] = hotToTitle(data[i],3);
                             break;
                     }
                 }
                 res.render('blog',{hotTitle1: titles[0],hotTitle2: titles[1],hotTitle3: titles[2],hotTitle4 : titles[3]});
-
-
             }
         });
+});
+
+//获取文章函数：
+router.get('/article/:id', function (req, res) {
+    var id = req.params['id'];
+    Poster.findById(id
+    ,function (err, post) {
+        var subject = post;
+       if (!err){
+           if (!post){
+               console.log('文章找不到了');
+               res.send('<p>文章找不到了！</p>')
+           }else {
+               var title = "<h2 style='text-align: center'>"+ subject['title'] +"</h2>"+
+                   "<p style='margin-top: 5px;margin-bottom: 0px; text-align: center'><small>阅读量：" + subject['readNum'] +
+                   " 日期： " + subject['createdOn']+
+                   "标签：" + subject['tags']+ "</small></p>";
+               res.render('article',{title: title, post:post['content']});
+           }
+
+       }
+       else {
+           res.send("<p>查找文章失败！</p>")
+       }
+    });
 });
 
 
@@ -148,6 +174,7 @@ function findHot(subject) {
             if(!err){
                 if(data != ''){
                     HotPost.create({
+                        id: data[0]['_id'],
                         subject: data[0]['subject'],  //文章的类别
                         tags: data[0]['tags'],     //文章系类
                         title:  data[0]['title'],   //文章的标题
@@ -171,16 +198,15 @@ function findHot(subject) {
         }
     )
 }
-//cong最近数据库获取文章的函数。
-
-
-
 //将最新文章抽取的数据转换成html
-function hotToTitle(subject) {
-    var title = "<a href='/articles/article/'" + subject['_id'] + "> "+ subject['title']+"</a>" +
-        "<p style='margin-top: 5px;margin-bottom: 0px'><small>阅读量：" + subject['readNum'] +
+function hotToTitle(subject,i) {
+    var title = "<div class='list-group-item' id='getBlog"+ i+ "'><h4 class=" + "list-group-item-heading> <a onclick='return false;' href='/articles/article/"+subject['_id']+"'> "+ subject['title']+"</a></h4>" +
+        "<p class='list-group-item-text' style='margin-top: 5px;margin-bottom: 0px'><small>阅读量：" + subject['readNum'] +
         " 日期： " + subject['createdOn'] +
-         "标签：" + subject['tags']+ "</small></p>";
+        "标签：" + subject['tags']+ "</small></p></div> ";
     return title;
 }
+
+//
+
 module.exports = router;

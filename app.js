@@ -45,7 +45,9 @@ app.use('/processor', processor);
 app.use('/articles', articles);
 
 //下面的代码用于测设使用
-
+app.use('/test', function (req, res) {
+   res.render('article',{content:'<h1>Hello World!</h1>'})
+});
 //以上的代码用于测试使用
 
 

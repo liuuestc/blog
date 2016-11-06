@@ -20,6 +20,7 @@ var PostSchema = new Schema({
 var Poster = mongoose.model( 'Poster', PostSchema );
 
 var hotSchema = new Schema({
+    id : String,
     subject: String,  //文章的类别
     tags: String,     //文章系类
     title:  String,   //文章的标题

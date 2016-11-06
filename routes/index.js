@@ -27,19 +27,18 @@ router.get('/blog',function (req, res) {
                 var titles = new Array(4);
                 var num = data.length;
                 for (var i =0 ;i < num; i++){
-                    var t = hotToTitle(data[i]);
                     switch (data[i]['subject']){
                         case 'Language' :
-                            titles[0] = t;
+                            titles[0] = hotToTitle(data[i],0);
                             break;
                         case 'Ideology' :
-                            titles[1] = t;
+                            titles[1] = hotToTitle(data[i],1);
                             break;
                         case 'China':
-                            titles[2] = t;
+                            titles[2] = hotToTitle(data[i],2);
                             break;
                         case 'Foreign':
-                            titles[3] = t;
+                            titles[3] = hotToTitle(data[i],3);
                             break;
                     }
                 }
@@ -71,8 +70,8 @@ router.get('/contact', function (req, res) {
    res.render('contact');
 });
 
-function hotToTitle(subject) {
-    var title = "<a href='/articles/article/'" + subject['_id'] + "> "+ subject['title']+"</a>" +
+function hotToTitle(subject,i) {
+    var title = "<div id='getBlog"+ i+ "'><a onclick='return false;' href='/articles/article/"+subject['id']+"'> "+ subject['title']+"</a></div> " +
         "<p style='margin-top: 5px;margin-bottom: 0px'><small>阅读量：" + subject['readNum'] +
         " 日期： " + subject['createdOn'] +
         "标签：" + subject['tags']+ "</small></p>";

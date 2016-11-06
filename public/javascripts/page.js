@@ -4,39 +4,108 @@
  */
 
 $(document).ready(function () {
-
-
-
-
-
     //处理访客主题事件
-    $('#language').click(function () {
-        alert("你点击了language");
-        var getUrl = '/articles/category/language/0'
-        var flag = true ;//简单的判断是否还有下一页
-        $.post(getUrl,function (response, status) {
-            if (status = 'success'){
-                if(response['status'] == 'ok'){
-                    var postes = response['postes'];
-                    var length = postes.length;
-                    if(length < 10) flag = false;
-                    var titles = '';
-                    for (var i=0; i < length; i++){
-                        titles +=returnTitle(postes[i]);
-                    }
-                    $('#blog').html(titles);
-                    //判断是否有下一页，下面的函数添加上一页或下一页
-                }
-                else {
-                    alert('文章获取失败!');
-                }
-            }
-            else {
-                alert('与服务器连接失败！');
+    $('#le').click(function () {
+        returnTitle('Language');
+    });
+    $('#iy').click(function () {
+       returnTitle('Ideology');
+    });
+    $('#ca').click(function () {
+       returnTitle('China');
+    });
+    $('#fn').click(function () {
+       returnTitle('Foreign');
+    });
+
+    //处理访客从blog首页访问文章
+    $('#getBlog0').click(function () {
+       var getUrl = $('#getBlog0 a').attr('href');
+        $.get(getUrl,
+        function (response, status) {
+            if(status == 'success'){
+                $('#blog').html(response);
+            }else {
+                alert('与服务器连接失败');
             }
         });
-
-
+    });
+    $('#getBlog2').click(function () {
+        var getUrl = $('#getBlog2 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog3').click(function () {
+        var getUrl = $('#getBlog3 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog1').click(function () {
+        var getUrl = $('#getBlog1 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog4').click(function () {
+        var getUrl = $('#getBlog4 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog5').click(function () {
+        var getUrl = $('#getBlog5 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog6').click(function () {
+        var getUrl = $('#getBlog6 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
+    });
+    $('#getBlog7').click(function () {
+        var getUrl = $('#getBlog7 a').attr('href');
+        $.get(getUrl,
+            function (response, status) {
+                if(status == 'success'){
+                    $('#blog').html(response);
+                }else {
+                    alert('与服务器连接失败');
+                }
+            });
     });
     //给作者留言
     $('#submit2').click(function () {
@@ -75,12 +144,29 @@ $(document).ready(function () {
     });
 });
 
-//最重要的函数确定怎么添加文章列表
-function returnTitle(titles) {
-    var rtnTitle = '';
-    return rtnTitle;
+function getblog() {
+    alert(this.attr('href'));
+    return false;
 }
 
+
+//最重要的函数确定怎么添加文章列表
+function returnTitle(subject) {
+    var getUrl = '/articles/class/'+subject+'/0';
+    $.get(getUrl,function (response, status) {
+        if (status = 'success'){
+            console.log(response);
+                $('#blog').html(response);
+                //判断是否有下一页，下面的函数添加上一页或下一页
+        }
+        else {
+            alert('与服务器连接失败！');
+        }
+    });
+}
+
+
+//暂时未使用
 //根据标题返回文章的url，addTitle函数使用
 function returnUrl(title,id) {
     var url;
