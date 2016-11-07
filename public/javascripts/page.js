@@ -179,3 +179,17 @@ function processDateString(date) {
     return dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate() +
         '  ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
 }
+
+function nextPage(url) {
+    $.get(url,function (response, status) {
+        if (status = 'success'){
+            console.log(response);
+            $('#blog').html(response);
+            //判断是否有下一页，下面的函数添加上一页或下一页
+        }
+        else {
+            alert('与服务器连接失败！');
+            location.href = '/';
+        }
+    });
+}

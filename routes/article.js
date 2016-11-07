@@ -69,32 +69,66 @@ router.post('/uploadImg', function (req, res) {
 router.get('/class/:category/:id',function (req, res) {
    var category = req.params['category'],
        id = req.params['id'];
-    Poster.find(
-        {subject: category},
-        'title tags readNum createdOn _id',
-        {sort: '-_id',skip:parseInt(req.params['id'])*8,limit: 8},
-        function (err, poster) {
+    //防止有恶意输入的数据
+    if(id < 0){
+        id = 0;
+    }
+    Poster.count(
+        {'subject':category}
+        ,function (err, counter) {
             if(!err){
-                var titles = '';
-                var length = poster.length;
-                for (var i = 1; i < length ; i ++){
-                    titles += hotToTitle(poster[i],i);
+                if (!counter){
+                    res.send('<h2>本类别没有文章</h2>')
+                }else {
+                    Poster.find(
+                        {subject: category},
+                        'title tags readNum createdOn _id',
+                        {sort: {'_id' : -1},skip:parseInt(req.params['id'])*8,limit: 8},
+                        function (err, poster) {
+                            if(!err){
+                                var pre = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+(id-1)+"'>Prev</a></li>";
+                                var next = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+(id+1)+"'>Next</a></li>";
+                                var page = '';
+                                var titles = '';
+                                var length = poster.length;
+                                for (var i = 0; i < length ; i ++){
+                                    titles += hotToTitle(poster[i],i);
+                                }
+
+                                //编辑下面的分页
+                                for (var j = 0; j < (counter-1)/10 ;j++){
+                                    page = page + "<li> <a href='javascript:;' onclick='nextPage(this.name)' name =/articles/class/"+category+"/"+j+"'>  "+(j+1) + "</a></li>";
+                                }
+
+                                res.render('titles',{titles: titles,pages:pre+page+next});
+                            }
+                            if (!poster){
+                                res.render('<p>没有更多的文章了</p>');
+                            }
+                        });
                 }
-                res.render('titles',{titles: titles});
-            }
-            if (!poster){
-                res.render('<p>没有更多的文章了</p>');
+
+            }else {
+                res.send('<h2>获取列表失败</h2>')
             }
         });
 });
 
 router.get('/createHot', function (req, res) {
-    //下面的代码以后移动到上面,必须登陆后才可以查看。
-    findHot('Language');      //这里由于是异步的所以不能同时返回
-    findHot('Ideology');
-    findHot('China');
-    findHot('Foreign');
-    res.send('创建成功！');
+    HotPost.remove({},function (err,data) {
+       if(!err){
+           //下面的代码以后移动到上面,必须登陆后才可以查看。
+           findHot('Language');      //这里由于是异步的所以不能同时返回
+           findHot('Ideology');
+           findHot('China');
+           findHot('Foreign');
+           res.send('<h2>创建成功！</h2>');
+       } else {
+           console.log('删除失败！');
+           res.send('<h2>创建失败</h2>')
+       }
+    });
+
 });
 
 //将获取博客类别的主页换成下面的函数。
@@ -125,10 +159,11 @@ router.get('/hot', function (req, res) {
         });
 });
 
-//获取文章函数：
+//获取文章函数,并且更新阅读数量：
 router.get('/article/:id', function (req, res) {
     var id = req.params['id'];
-    Poster.findById(id
+    Poster.findByIdAndUpdate(id,
+        {$inc:{readNum:1}}
     ,function (err, post) {
         var subject = post;
        if (!err){
@@ -150,14 +185,6 @@ router.get('/article/:id', function (req, res) {
     });
 });
 
-
-//文章编辑后展示页面
-
-router.get('/show/:date', function (req, res) {
-    console.log(req.params['date']);
-
-});
-
 function processDateString(date) {
     var dt = new Date(date.toString());
     return dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate() +
@@ -169,7 +196,7 @@ function findHot(subject) {
     Poster.find(
         {subject: subject},
         {},
-        {sort: '-_id'},
+        {sort: {readNum :-1, _id: -1}},
         function (err, data) {
             if(!err){
                 if(data != ''){
@@ -206,7 +233,5 @@ function hotToTitle(subject,i) {
         "标签：" + subject['tags']+ "</small></p></div> ";
     return title;
 }
-
 //
-
 module.exports = router;

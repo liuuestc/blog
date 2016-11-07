@@ -45,9 +45,7 @@ app.use('/processor', processor);
 app.use('/articles', articles);
 
 //下面的代码用于测设使用
-app.use('/test', function (req, res) {
-   res.render('article',{content:'<h1>Hello World!</h1>'})
-});
+
 //以上的代码用于测试使用
 
 
@@ -57,7 +55,7 @@ app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
     //添加了错误页面，后面到代码不会执行，最后可能需要删除。
-    res.render('index');
+    res.redirect('/');
 });
 
 // error handler
