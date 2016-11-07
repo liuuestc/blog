@@ -15,11 +15,60 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/create',function (req, res) {
-   if(req.session.isLogin == true)
+   if(req.session.isLogin == true);
        res.render('post',{title: '编辑博文！'});
     //需要修改为首页
     res.render('post',{title: '编辑博文！'});
 });
+//用于编辑文章使用
+router.get('/edit/:id',function (req,res) {
+   if(req.session.isLogin == true){
+        res.render('edit', {id:1})
+   }
+    Poster.findById(
+        req.params['id']
+        ,function (err, post) {
+            if(!err){
+                if(!post){
+                    res.send('<h2>文章获取失败</h2>')
+                }else {
+                    res.render('edit',{id: post._id, tags: post.tags, title : post.title, content: post.content});
+                }
+            }
+            else {
+                res.send('<h2>编辑失败</h2>');
+            }
+        });
+});
+router.post('/edit/:id', function (req, res) {
+   if (req.session.isLogin == true){
+
+   }
+   Poster.findByIdAndUpdate(
+       req.params['id']
+       ,{
+           //subject: req.body.subject,  //文章的类别
+           //tags: req.body.tags,     //文章系类
+           //title:  req.body.title,   //文章的标题
+           content: req.body.thecontent,
+           //modifyOn:  {type: Date,default:Date.now}
+           }//最后修改时间
+       ,function (err,post) {
+            if (!err){
+                if(!post){
+                    console.log('文章修改失败');
+                    res.send("<h2>文章修改失败</h2>");
+                }else {
+                    res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: post.createOn, readNum: post.readNum,id: post._id});
+                }
+
+            }else {
+                res.send('文章修改失败！')
+                //res.render('/articles/edit/'+req.params['id']);
+            }
+       })
+});
+
 
 //将文章存储到数据库中。
 router.post('/create', function (req, res) {
@@ -35,7 +84,7 @@ router.post('/create', function (req, res) {
             console.log('文章创建成功！');
             var date = processDateString(post.createdOn);
             console.log(date);
-            res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: date, readNum: post.readNum});
+            res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: date, readNum: post.readNum,id: post._id});
         }
         if (!post){
             console.log("文章创建失败！");
