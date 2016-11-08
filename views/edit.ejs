@@ -25,16 +25,7 @@
   <div style="width: 80%" >
     <form  id="article" action="/articles/edit/<%= id%>" method="post">
       <h4 style="display: inline">文章的主题   :</h4>
-      <select name="subject" style="width: 20% ;height: 25px ;display: inline; border: hidden">
-        <optgroup label="Computer Science">
-          <option value="Language">Language</option>
-          <option value="Ideology">Ideology</option>
-        </optgroup>
-        <optgroup label="Reading Notes">
-          <option value="China">China</option>
-          <option value="Foreign">Foreign</option>
-        </optgroup>
-      </select>
+      <input id="subject" name="subject" type="text" value="<%= subject%>" style="width: 88%;height:20px;display:inline;border-top-left-radius: 5px;float: right" />
       <div style="clear:both; margin-top: 10px"></div>
       <h4 style="display: inline; border: hidden">文章的标签:</h4>
       <input id="tags" name="tags" type="text" value="<%= tags%>" style="width: 88%;height:20px;display:inline;border-top-left-radius: 5px;float: right" placeholder="如果有多个请使用逗号隔开"/>

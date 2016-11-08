@@ -25,9 +25,11 @@ router.post('/login', function (req, res) {
           console.log(error);
           res.render('/error');
         }
-        req.session.username = user.name;
-        req.session.isLogin = true;
-        res.redirect('/users/backend/'+user.name);
+        if(user){
+            req.session.username = user.name;
+            req.session.isLogin = true;
+            res.redirect('/users/backend/'+user.name);
+        }
       }
   );
 });

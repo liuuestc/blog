@@ -131,7 +131,7 @@ $(document).ready(function () {
             if (status == 'success'){
                 if (response['status'] == 'ok'){
                     confirm('留言提交成功,非常感谢你的留言！');
-                    location.href = '/';
+                    location.href = '#';
                 }
                 else {
                     alert('留言提交失败，请重新提交！');
@@ -189,7 +189,7 @@ function nextPage(url) {
         }
         else {
             alert('与服务器连接失败！');
-            location.href = '/';
+            location.href = '#';
         }
     });
 }

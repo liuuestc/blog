@@ -18,81 +18,90 @@ router.get('/create',function (req, res) {
    if(req.session.isLogin == true);
        res.render('post',{title: '编辑博文！'});
     //需要修改为首页
-    res.render('post',{title: '编辑博文！'});
+    res.redirect('/');
+});
+
+//将文章存储到数据库中。
+router.post('/create', function (req, res) {
+    if(req.session.isLogin == true){
+        Poster.create({
+            subject: req.body.subject,
+            tags : req.body.tags,
+            title: req.body.title,
+            content : req.body.thecontent,
+            author: req.session.username
+        }, function (err, post) {
+            if (!err){
+                console.log('文章创建成功！');
+                var date = processDateString(post.createdOn);
+                console.log(date);
+                res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: date, readNum: post.readNum,id: post._id});
+            }
+            if (!post){
+                console.log("文章创建失败！");
+                res.redirect('/articles/create');
+            }
+        });
+    }else {
+        req.redirect('/');
+    }
+
+    //console.log(req.body);
+
 });
 //用于编辑文章使用
 router.get('/edit/:id',function (req,res) {
    if(req.session.isLogin == true){
-        res.render('edit', {id:1})
+       Poster.findById(
+           req.params['id']
+           ,function (err, post) {
+               if(!err){
+                   if(!post){
+                       res.send('<h2>文章获取失败</h2>')
+                   }else {
+                       res.render('edit',{id: post._id, tags: post.tags, title : post.title, content: post.content, subject :post.subject});
+                   }
+               }
+               else {
+                   res.send('<h2>编辑失败</h2>');
+               }
+           });
    }
-    Poster.findById(
-        req.params['id']
-        ,function (err, post) {
-            if(!err){
-                if(!post){
-                    res.send('<h2>文章获取失败</h2>')
-                }else {
-                    res.render('edit',{id: post._id, tags: post.tags, title : post.title, content: post.content});
-                }
-            }
-            else {
-                res.send('<h2>编辑失败</h2>');
-            }
-        });
+    else res.redirect('/');
 });
 router.post('/edit/:id', function (req, res) {
    if (req.session.isLogin == true){
-
-   }
-   Poster.findByIdAndUpdate(
-       req.params['id']
-       ,{
-           //subject: req.body.subject,  //文章的类别
-           //tags: req.body.tags,     //文章系类
-           //title:  req.body.title,   //文章的标题
-           content: req.body.thecontent,
-           //modifyOn:  {type: Date,default:Date.now}
+       Poster.findByIdAndUpdate(
+           req.params['id']
+           ,{
+               //文章的类别
+               tags: req.body.tags,     //文章系类
+               title:  req.body.title,   //文章的标题
+               modifyOn:  {type: Date,default:Date.now},
+               content: req.body.thecontent,
+               subject: req.body.subject
            }//最后修改时间
-       ,function (err,post) {
-            if (!err){
-                if(!post){
-                    console.log('文章修改失败');
-                    res.send("<h2>文章修改失败</h2>");
-                }else {
-                    res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: post.createOn, readNum: post.readNum,id: post._id});
-                }
+           ,{
+               new :true,
+               upsert: true
+           }
+           ,function (err,post) {
+               if (!err){
+                   if(!post){
+                       console.log('文章修改失败');
+                       res.send("<h2>文章修改失败</h2>");
+                   }else {
+                       res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: post.createdOn, readNum: post.readNum,id: post._id});
+                   }
 
-            }else {
-                res.send('文章修改失败！')
-                //res.render('/articles/edit/'+req.params['id']);
-            }
-       })
+               }else {
+                   res.send('文章修改失败！')
+                   //res.render('/articles/edit/'+req.params['id']);
+               }
+           });
+   }
+    else res.redirect('/');
 });
-
-
-//将文章存储到数据库中。
-router.post('/create', function (req, res) {
-    //console.log(req.body);
-    Poster.create({
-        subject: req.body.subject,
-        tags : req.body.tags,
-        title: req.body.title,
-        content : req.body.thecontent,
-        author: 'liuuestc'
-    }, function (err, post) {
-        if (!err){
-            console.log('文章创建成功！');
-            var date = processDateString(post.createdOn);
-            console.log(date);
-            res.render('posted',{subject:post.subject, tags:post.tags, title: post.title,content: post.content,author : post.author, createOn: date, readNum: post.readNum,id: post._id});
-        }
-        if (!post){
-            console.log("文章创建失败！");
-            res.redirect('/articles/create');
-        }
-    });
-});
-
 //处理图片有kindeditor上传
 router.post('/uploadImg', function (req, res) {
     var form = new formidable.IncomingForm();
@@ -113,7 +122,6 @@ router.post('/uploadImg', function (req, res) {
         res.send(info)
     });
 });
-
 //获取某一类型的文章,这个函数用于后面的使用。
 router.get('/class/:category/:id',function (req, res) {
    var category = req.params['category'],
@@ -135,17 +143,25 @@ router.get('/class/:category/:id',function (req, res) {
                         {sort: {'_id' : -1},skip:parseInt(req.params['id'])*8,limit: 8},
                         function (err, poster) {
                             if(!err){
-                                var pre = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+(id-1)+"'>Prev</a></li>";
-                                var next = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+(id+1)+"'>Next</a></li>";
+                                if (!poster){
+                                    res.send('<h2>没有更多文章了！</h2>');
+                                }
+
                                 var page = '';
                                 var titles = '';
                                 var length = poster.length;
                                 for (var i = 0; i < length ; i ++){
                                     titles += hotToTitle(poster[i],i);
                                 }
+                                var idnext = (parseInt(id)+1);
+                                if (length != 8){
+                                    idnext = parseInt(id);
+                                }
 
+                                var pre = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+(parseInt(id)-1)+"'>Prev</a></li>";
+                                var next = "<li><a href='javascript:;' onclick='nextPage(this.name)' name = /articles/class/"+category+"/"+idnext+"'>Next</a></li>";
                                 //编辑下面的分页
-                                for (var j = 0; j < (counter-1)/10 ;j++){
+                                for (var j = 0; j < (counter-1)/8 ;j++){
                                     page = page + "<li> <a href='javascript:;' onclick='nextPage(this.name)' name =/articles/class/"+category+"/"+j+"'>  "+(j+1) + "</a></li>";
                                 }
 
@@ -164,22 +180,23 @@ router.get('/class/:category/:id',function (req, res) {
 });
 
 router.get('/createHot', function (req, res) {
-    HotPost.remove({},function (err,data) {
-       if(!err){
-           //下面的代码以后移动到上面,必须登陆后才可以查看。
-           findHot('Language');      //这里由于是异步的所以不能同时返回
-           findHot('Ideology');
-           findHot('China');
-           findHot('Foreign');
-           res.send('<h2>创建成功！</h2>');
-       } else {
-           console.log('删除失败！');
-           res.send('<h2>创建失败</h2>')
-       }
-    });
-
+    if (req.session.isLogin == true){
+        HotPost.remove({},function (err,data) {
+            if(!err){
+                //下面的代码以后移动到上面,必须登陆后才可以查看。
+                findHot('Language');      //这里由于是异步的所以不能同时返回
+                findHot('Ideology');
+                findHot('China');
+                findHot('Foreign');
+                res.send('<h2>创建成功！</h2>');
+            } else {
+                console.log('删除失败！');
+                res.send('<h2>创建失败</h2>')
+            }
+        });
+    }
+    else res.redirect('/');
 });
-
 //将获取博客类别的主页换成下面的函数。
 router.get('/hot', function (req, res) {
     HotPost.find(
@@ -207,7 +224,6 @@ router.get('/hot', function (req, res) {
             }
         });
 });
-
 //获取文章函数,并且更新阅读数量：
 router.get('/article/:id', function (req, res) {
     var id = req.params['id'];
@@ -233,13 +249,11 @@ router.get('/article/:id', function (req, res) {
        }
     });
 });
-
 function processDateString(date) {
     var dt = new Date(date.toString());
     return dt.getFullYear() + '-' + dt.getMonth() + '-' + dt.getDate() +
         '  ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
 }
-
 //数据库插入最新文章函数,
 function findHot(subject) {
     Poster.find(
